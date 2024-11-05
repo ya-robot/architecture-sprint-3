@@ -1,6 +1,20 @@
-# Базовая настройка
+# Smart Home
 
-## Запуск minikube
+## Docs
+
+### Plant UML & ERD
+
+You can find related diagrams at this path:
+
+- C4
+  - `docs/diagrams/c4-containers.puml`
+  - `docs/diagrams/c4-components.puml`
+  - `docs/diagrams/c4-code.puml`
+- ERD
+
+## Базовая настройка
+
+### Запуск minikube
 
 [Инструкция по установке](https://minikube.sigs.k8s.io/docs/start/)
 
@@ -8,7 +22,7 @@
 minikube start
 ```
 
-## Добавление токена авторизации GitHub
+### Добавление токена авторизации GitHub
 
 [Получение токена](https://github.com/settings/tokens/new)
 
@@ -16,7 +30,7 @@ minikube start
 kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --docker-username=<github_username> --docker-password=<github_token> -n default
 ```
 
-## Установка API GW kusk
+### Установка API GW kusk
 
 [Install Kusk CLI](https://docs.kusk.io/getting-started/install-kusk-cli)
 
@@ -24,7 +38,7 @@ kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --doc
 kusk cluster install
 ```
 
-## Смена адреса образа в helm chart
+### Смена адреса образа в helm chart
 
 После того как вы сделали форк репозитория и у вас в репозитории отработал GitHub Action. Вам нужно получить адрес образа <https://github.com/><github_username>/architecture-sprint-3/pkgs/container/architecture-sprint-3
 
@@ -39,7 +53,7 @@ image:
   tag: latest
 ```
 
-## Настройка terraform
+### Настройка terraform
 
 [Установите Terraform](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform)
 
@@ -57,7 +71,7 @@ provider_installation {
 }
 ```
 
-## Применяем terraform конфигурацию
+### Применяем terraform конфигурацию
 
 ```bash
 cd terraform
