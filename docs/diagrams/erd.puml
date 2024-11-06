@@ -1,0 +1,56 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+entity home {
+    *id: string
+    name: string
+    owner: string
+}
+
+entity router {
+    *imei: string
+    home_id: string
+}
+
+entity device {
+    *id: string
+    name: string
+    device_type_id: int
+}
+
+entity device_type {
+    *id: int
+    name: string
+    revision: string
+}
+
+entity tag {
+    *id: int
+    device_id: string
+    name: string
+    unit: string
+    data_type: int
+}
+
+entity rule {
+    *id: int
+    tag_id: int
+    operator: string
+    target: string
+    target_type: string
+}
+
+entity telemetry_device_n {
+    *timestamp: timestamp
+    tag_1: int,float,bool
+    ...
+    tag_n: int,float,bool
+}
+
+home ||-o{ router
+router ||-o{ device
+device ||-|| device_type
+device ||-o{ tag
+tag ||-o{ rule
+
+@enduml

@@ -16,8 +16,9 @@ You can find related diagrams at this path:
   - `docs/diagrams/c4-components-telemetry-writer.puml`
   - `docs/diagrams/c4-components-mqtt-adapter.puml`
   - `docs/diagrams/c4-components-notifications.puml`
-  - `docs/diagrams/c4-code.puml`
+  - `docs/diagrams/c4-code-preview.puml` (Описал очень кратко, дофига расписывать не хочу. Не фанат ООП)
 - ERD
+  - `docs/diagrams/erd.puml`
 
 ## Базовая настройка
 

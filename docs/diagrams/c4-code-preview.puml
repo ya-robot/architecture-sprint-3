@@ -1,0 +1,59 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+class User {
+  +String Email
+}
+
+class Home {
+  +String ID
+  +String Owner
+  +String Name
+}
+
+class Router {
+  +String IMEI
+  +String HomeID
+  +List<Device> Device
+  +void lastOnline()
+  +void connectDevice()
+  +void disconnectDevice()
+}
+
+class Rule {
+  +String Operator
+  +String Target
+  +String TargetType
+  +void enforce()
+}
+
+class Tag {
+  +String Name
+  +String Unit
+  +Int DataType
+  +List<Rule> Rule
+  +void addRule()
+  +void deleteRule()
+  +void enforceRuleAll()
+  +void enforceRuleOnce()
+  +void enforceRuleAny()
+}
+
+class DeviceType {
+  +String Name
+  +String Revision
+}
+
+class Device {
+  +String Name
+  +String SerialNumber
+  +List<Tags> Tags
+  +void viewTagsData()
+}
+
+Router --{ Device : has
+Device --{ Tag : has
+Device --> DeviceType : includes
+Tag --{ Rule : has
+
+@enduml
