@@ -7,6 +7,7 @@
 You can find related diagrams at this path:
 
 - C4
+  - `docs/diagrams/c4-context.puml`
   - `docs/diagrams/c4-containers.puml`
   - `docs/diagrams/c4-components-homes.puml`
   - `docs/diagrams/c4-components-routers.puml`
