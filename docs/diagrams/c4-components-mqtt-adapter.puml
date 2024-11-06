@@ -1,0 +1,25 @@
+@startuml Smart Home
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(apiGW, "API Gateway", "APISIX", "")
+
+Container_Boundary(mqttAdapter, "MQTT Adapter") {
+    Component(mqttAdapterController, "MQTT Adapter Controller", "HTTP,gRPC server", "Allows admins to monitor and manage adapter")
+    Component(mqttAdapterService, "MQTT Adapter Service", "Golang interface", "Reads, transforms & sends raw data")
+    Component(messageQueueClient, "Message Queue Client", "Golang interface", "Pub/Sub to data channels")
+}
+
+ContainerQueue(brokerMQTT, "MQTT Broker", "VerneMQ", "Provide EDGE telemetry collection")
+ContainerQueue(kafka, "Message Queue", "Kafka", "Provide durable message queue for data collection and processing")
+
+Rel_D(apiGW, mqttAdapterController, "Makes REST, RPC calls", "HTTP, gRPC")
+
+Rel_D(mqttAdapterController, mqttAdapterService, "Uses")
+
+Rel_R(mqttAdapterService, messageQueueClient, "Uses")
+
+Rel_U(messageQueueClient, brokerMQTT, "Pub/Sub", "TLS")
+Rel_D(messageQueueClient, kafka, "Pub/Sub", "TLS")
+
+@enduml

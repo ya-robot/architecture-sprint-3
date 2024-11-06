@@ -1,0 +1,43 @@
+@startuml Smart Home
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(apiGW, "API Gateway", "APISIX", "")
+
+Container_Boundary(telemetryWriter, "Telemetry Writer") {
+    Component(telemetryWriterController, "Telemetry Writer Controller", "HTTP,gRPC server", "Allows admins to monitor and manage data processing")
+    Component(telemetryWriterService, "Telemetry Writer Service", "Golang interface", "Reads & processes raw telemetry data")
+    Component(messageQueueClient, "Message Queue Client", "Golang interface", "Pub/Sub to router's data channels, events and audit logs")
+    Component(routersClient, "Routers Client", "Golang interface", "Sends requests to Routers Service")
+    Component(devicesClient, "Devices Client", "Golang interface", "Sends requests to Devices Service")
+    Component(telemetryRulesClient, "Telemetry Rules Client", "Golang interface", "Sends requests to Telemetry Rules Service")
+    Component(telemetryWriterRepository, "Telemetry Writer Repository", "Golang interface", "Sends requests to storage driver")
+}
+
+ContainerDb(db, "Database", "TimescaleDB", "Stores user's telemetry timeseries data")
+
+ContainerQueue(kafka, "Message Queue", "Kafka", "Manages system events")
+
+Container(routers, "Routers", "Golang", "Manage user's routers")
+Container(devices, "Devices", "Golang", "Manage user's devices")
+Container(telemetryRules, "Telemetry Rules", "Golang", "Manage user's telemetry rules")
+
+Rel_D(apiGW, telemetryWriterController, "Makes REST, RPC calls", "HTTP, gRPC")
+
+Rel_D(telemetryWriterController, telemetryWriterService, "Uses")
+
+Rel_R(telemetryWriterService, messageQueueClient, "Uses")
+Rel_L(telemetryWriterService, routersClient, "Uses")
+Rel_L(telemetryWriterService, devicesClient, "Uses")
+Rel_L(telemetryWriterService, telemetryRulesClient, "Uses")
+Rel_D(telemetryWriterService, telemetryWriterRepository, "Uses")
+
+Rel_D(telemetryWriterRepository, db, "Uses", "TLS")
+
+Rel_R(messageQueueClient, kafka, "Pub/Sub", "TLS")
+
+Rel_L(routersClient, routers, "Makes RPC calls", "gRPC")
+Rel_L(devicesClient, devices, "Makes RPC calls", "gRPC")
+Rel_L(telemetryRulesClient, telemetryRules, "Makes RPC calls", "gRPC")
+
+@enduml

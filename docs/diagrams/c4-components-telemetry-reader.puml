@@ -1,0 +1,40 @@
+@startuml Smart Home
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(apiGW, "API Gateway", "APISIX", "")
+
+Container_Boundary(telemetryReader, "Telemetry Reader") {
+    Component(telemetryReaderController, "Telemetry Reader Controller", "HTTP,gRPC server", "Allows users to read telemetry aggregates and stats")
+    Component(telemetryReaderService, "Telemetry Reader Service", "Golang interface", "Reads user's data aggregates and stats")
+    Component(messageQueueClient, "Message Queue Client", "Golang interface", "Pub/Sub to events and audit logs")
+    Component(devicesClient, "Devices Client", "Golang interface", "Sends requests to Devices Service")
+    Component(telemetryRulesClient, "Telemetry Rules Client", "Golang interface", "Sends requests to Telemetry Rules Service")
+    Component(telemetryReaderRepository, "Telemetry Reader Repository", "Golang interface", "Sends requests to storage driver")
+}
+
+ContainerDb(db, "Database", "TimescaleDB", "Stores user's telemetry timeseries data")
+
+ContainerQueue(kafka, "Message Queue", "Kafka", "Manages system events")
+
+Container(devices, "Devices", "Golang", "Manage user's devices")
+Container(telemetryRules, "Telemetry Rules", "Golang", "Manage user's telemetry rules")
+
+Rel_D(apiGW, telemetryReaderController, "Makes REST, RPC calls", "HTTP, gRPC")
+
+Rel_D(telemetryReaderController, telemetryReaderService, "Uses")
+
+Rel_L(telemetryReaderService, devicesClient, "Uses")
+Rel_L(telemetryReaderService, telemetryRulesClient, "Uses")
+Rel_R(telemetryReaderService, messageQueueClient, "Uses")
+Rel_D(telemetryReaderService, telemetryReaderRepository, "Uses")
+
+Rel_D(telemetryReaderRepository, db, "Uses", "TLS")
+
+Rel_R(messageQueueClient, kafka, "Pub/Sub", "TLS")
+
+Rel_L(devicesClient, devices, "Makes RPC calls", "gRPC")
+
+Rel_L(telemetryRulesClient, telemetryRules, "Makes RPC calls", "gRPC")
+
+@enduml

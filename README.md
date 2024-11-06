@@ -8,7 +8,14 @@ You can find related diagrams at this path:
 
 - C4
   - `docs/diagrams/c4-containers.puml`
-  - `docs/diagrams/c4-components.puml`
+  - `docs/diagrams/c4-components-homes.puml`
+  - `docs/diagrams/c4-components-routers.puml`
+  - `docs/diagrams/c4-components-devices.puml`
+  - `docs/diagrams/c4-components-telemetry-rules.puml`
+  - `docs/diagrams/c4-components-telemetry-reader.puml`
+  - `docs/diagrams/c4-components-telemetry-writer.puml`
+  - `docs/diagrams/c4-components-mqtt-adapter.puml`
+  - `docs/diagrams/c4-components-notifications.puml`
   - `docs/diagrams/c4-code.puml`
 - ERD
 

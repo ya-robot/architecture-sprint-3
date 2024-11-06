@@ -1,0 +1,29 @@
+@startuml Smart Home
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(apiGW, "API Gateway", "APISIX", "")
+
+Container_Boundary(homes, "Homes") {
+    Component(homesController, "Homes Controller", "HTTP,gRPC server", "Allows users to manage their homes")
+    Component(homesService, "Homes Service", "Golang interface", "Homes CRUD, etc")
+    Component(messageQueueClient, "Message Queue Client", "Golang interface", "Pub/Sub to events and audit logs")
+    Component(homesRepository, "Homes Repository", "Golang interface", "Sends requests to storage driver")
+}
+
+ContainerDb(db, "Database", "Postgres", "Stores user's homes, etc")
+
+ContainerQueue(kafka, "Message Queue", "Kafka", "Manages system events")
+
+Rel_D(apiGW, homesController, "Makes REST, RPC calls", "HTTP, gRPC")
+
+Rel_D(homesController, homesService, "Uses")
+
+Rel_R(homesService, messageQueueClient, "Uses")
+Rel_D(homesService, homesRepository, "Uses")
+
+Rel_D(homesRepository, db, "Uses", "TLS")
+
+Rel_R(messageQueueClient, kafka, "Pub/Sub", "TLS")
+
+@enduml
