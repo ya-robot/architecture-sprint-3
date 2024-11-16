@@ -1,0 +1,297 @@
+openapi: "3.0.3"
+
+info:
+  title: "Routers API"
+  description: "Smart Home system Routers management API"
+  version: "1.0.0"
+  contact:
+    name: "John Doe"
+    email: "johndoe@mail.com"
+
+servers:
+- url: "http://localhost:8080"
+  description: "Local server"
+
+paths:
+  /routers:
+    get:
+      operationId: "listRouters"
+      tags:
+        - "routers"
+      summary: "List Routers"
+      description: "Returns a list of user's Routers"
+      parameters:
+      - $ref: "#/components/parameters/limit"
+      - $ref: "#/components/parameters/offset"
+      responses:
+        '200':
+          description: "A list of Routers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Routers"
+        default:
+          $ref: "#/components/responses/default"
+    post:
+      operationId: "createRouter"
+      tags:
+        - "routers"
+      summary: "Create Router"
+      description: "Creates new Router"
+      requestBody:
+        description: "Router"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Router"
+        required: true
+      responses:
+        '201':
+          description: "A Router was created"
+          headers:
+            Location:
+              description: "A new Router location path"
+              schema:
+                type: "string"
+                example: "/routers/869521060310641"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "Created"
+        '409':
+          description: "Router with that IMEI already exists"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "Conflict"
+        default:
+          $ref: "#/components/responses/default"
+  /routers/{imei}:
+    parameters:
+    - $ref: "#/components/parameters/routerImei"
+    get:
+      operationId: "getRouter"
+      tags:
+        - "routers"
+      summary: "Get Router"
+      description: "Returns user's Router by IMEI"
+      responses:
+        '200':
+          description: "A Router"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Router"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+    delete:
+      operationId: "deleteRouter"
+      tags:
+        - "routers"
+      summary: "Delete Router"
+      description: "Deletes user's Router by IMEI"
+      responses:
+        '204':
+          description: "Router have been successfully deleted"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+  /routers/{imei}/devices/{id}/link:
+    parameters:
+    - $ref: "#/components/parameters/routerImei"
+    - $ref: "#/components/parameters/deviceId"
+    post:
+      operationId: "linkDevice"
+      tags:
+        - "routers"
+        - "devices"
+      summary: "Link Router to Device"
+      description: "Links user's Router to Device"
+      responses:
+        '204':
+          description: "Linked successfully"
+        '404':
+          $ref: "#/components/responses/notFound"
+        '409':
+          $ref: "#/components/responses/conflict"
+        default:
+          $ref: "#/components/responses/default"
+  /routers/{imei}/devices/{id}/unlink:
+    parameters:
+    - $ref: "#/components/parameters/routerImei"
+    - $ref: "#/components/parameters/deviceId"
+    delete:
+      operationId: "unlinkDevice"
+      tags:
+        - "routers"
+        - "devices"
+      summary: "Unlink Router from Device"
+      description: "Unlinks user's Router from Device"
+      responses:
+        '204':
+          description: "Unlinked successfully"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+  /routers/{imei}/devices:
+    parameters:
+    - $ref: "#/components/parameters/routerImei"
+    - $ref: "#/components/parameters/limit"
+    - $ref: "#/components/parameters/offset"
+    get:
+      operationId: "listLinkedDevices"
+      tags:
+        - "routers"
+        - "devices"
+      summary: "List linked Devices"
+      description: "Returns a list of linked Devices"
+      responses:
+        '200':
+          description: "A list of linked Devices"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Devices"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+
+components:
+  schemas:
+    Router:
+      type: "object"
+      properties:
+        imei:
+          type: "string"
+          example: "869521060310641"
+        homeId:
+          type: "string"
+          example: "32aaf405-3f32-40cc-942e-b84cc905146c"
+      required:
+      - imei
+      example:
+        imei: "869521060310641"
+        homeId: "32aaf405-3f32-40cc-942e-b84cc905146c"
+    Routers:
+      type: "object"
+      properties:
+        total:
+          type: "integer"
+          example: 1000
+        limit:
+          type: "integer"
+          example: 100
+        offset:
+          type: "integer"
+          example: 10
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Router"
+      example:
+        total: 1000
+        limit: 100
+        offset: 10
+        data:
+        - imei: "869521060310641"
+          homeId: "32aaf405-3f32-40cc-942e-b84cc905146c"
+    Device:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          example: "32aaf405-3f32-40cc-942e-b84cc905146c"
+        name:
+          type: "string"
+          example: "MEGA Heat Control 10"
+        deviceTypeId:
+          type: "integer"
+          example: 13
+      required:
+      - id
+      - name
+      - deviceTypeId
+      example:
+        id: "32aaf405-3f32-40cc-942e-b84cc905146c"
+        name: "MEGA Heat Control 10"
+        deviceTypeId: 13
+    Devices:
+      type: "object"
+      properties:
+        total:
+          type: "integer"
+          example: 1000
+        limit:
+          type: "integer"
+          example: 100
+        offset:
+          type: "integer"
+          example: 10
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Device"
+  parameters:
+    routerImei:
+      name: "imei"
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+        example: "869521060310641"
+    limit:
+      name: "limit"
+      in: "query"
+      required: false
+      schema:
+       type: "integer"
+       example: 100
+    offset:
+      name: "offset"
+      in: "query"
+      required: false
+      schema:
+       type: "integer"
+       example: 10
+    deviceId:
+      name: "id"
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+        example: "32aaf405-3f32-40cc-942e-b84cc905146c"
+  responses:
+    default:
+      description: "Internal Server Error"
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Internal Server Error"
+    notFound:
+      description: "Not Found"
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Not Found"
+    conflict:
+      description: "Conflict"
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Conflict"
+
+tags:
+- name: "routers"
+  description: "Routers operations"
+- name: "devices"
+  description: "Devices operations"

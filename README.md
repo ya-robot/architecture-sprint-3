@@ -29,6 +29,12 @@ You can find related diagrams at this path:
 - ERD
   - `docs/diagrams/erd.puml`
 
+## OAS
+
+You can find related OpenAPI spec files at this path:
+
+- `docs/oas/*.yaml`
+
 ## Базовая настройка
 
 ### Запуск minikube
