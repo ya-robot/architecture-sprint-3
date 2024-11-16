@@ -1,6 +1,43 @@
-# Базовая настройка
+# Smart Home
 
-## Запуск minikube
+## Docs
+
+### Анализ существующего монолитного решения
+
+1. Проект отлично организован в рамках Clean Architecture by Uncle Bob. Функцианальность: существует CRUD для `Систем обогрева`, ендпоинты удаленного управления (вкл.,выкл.,установка температуры и получение текущих показателей). Есть отличная система развертки в виде Helm чарта под K8s с автоскейлером, узким горлышком будет выступать только БД и пропускная способность канала GSM сети опрашиваемых устройств.
+
+2. Можно явно выделить 3 домена из текущего решения - `Устройства умного дома`, `Удаленное управление`, `Удалённый мониторинг`
+
+3. Для покрытия текущих потребностей ведения бизнеса MVP (100 домов) данное решение актуально и не требует сильной доработки. Однако, что я считаю критически необходимым - брокер сообщений для телеметрии, например MQTT, отдельную систему сбора данных, устанавливаемую клиентом (роутер с ПО), которая опрашивает и управляет сенсорами. Надо вводить отдельную модель для Роутера с регистрацией по IMEI, универсальную модель\модели поддерживаемых устройств, типизацию сенсоров. Внедрять TimescaleDB для хранения и агрегации телеметрии. Квоты телеметрии на клиентов.
+
+### Plant UML & ERD
+
+You can find related diagrams at this path:
+
+- C4
+  - `docs/diagrams/c4-context.puml`
+  - `docs/diagrams/c4-containers.puml`
+  - `docs/diagrams/c4-components-homes.puml`
+  - `docs/diagrams/c4-components-routers.puml`
+  - `docs/diagrams/c4-components-devices.puml`
+  - `docs/diagrams/c4-components-telemetry-rules.puml`
+  - `docs/diagrams/c4-components-telemetry-reader.puml`
+  - `docs/diagrams/c4-components-telemetry-writer.puml`
+  - `docs/diagrams/c4-components-mqtt-adapter.puml`
+  - `docs/diagrams/c4-components-notifications.puml`
+  - `docs/diagrams/c4-code-preview.puml` (Описал очень кратко, дофига расписывать не хочу. Не фанат ООП)
+- ERD
+  - `docs/diagrams/erd.puml`
+
+## OAS
+
+You can find related OpenAPI spec files at this path:
+
+- `docs/oas/*.yaml`
+
+## Базовая настройка
+
+### Запуск minikube
 
 [Инструкция по установке](https://minikube.sigs.k8s.io/docs/start/)
 
@@ -8,7 +45,7 @@
 minikube start
 ```
 
-## Добавление токена авторизации GitHub
+### Добавление токена авторизации GitHub
 
 [Получение токена](https://github.com/settings/tokens/new)
 
@@ -16,7 +53,7 @@ minikube start
 kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --docker-username=<github_username> --docker-password=<github_token> -n default
 ```
 
-## Установка API GW kusk
+### Установка API GW kusk
 
 [Install Kusk CLI](https://docs.kusk.io/getting-started/install-kusk-cli)
 
@@ -24,7 +61,7 @@ kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --doc
 kusk cluster install
 ```
 
-## Смена адреса образа в helm chart
+### Смена адреса образа в helm chart
 
 После того как вы сделали форк репозитория и у вас в репозитории отработал GitHub Action. Вам нужно получить адрес образа <https://github.com/><github_username>/architecture-sprint-3/pkgs/container/architecture-sprint-3
 
@@ -39,7 +76,7 @@ image:
   tag: latest
 ```
 
-## Настройка terraform
+### Настройка terraform
 
 [Установите Terraform](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/terraform-quickstart#install-terraform)
 
@@ -57,7 +94,7 @@ provider_installation {
 }
 ```
 
-## Применяем terraform конфигурацию
+### Применяем terraform конфигурацию
 
 ```bash
 cd terraform

@@ -1,0 +1,313 @@
+openapi: "3.0.3"
+
+info:
+  title: "Homes API"
+  description: "Smart Home system Homes management API"
+  version: "1.0.0"
+  contact:
+    name: "John Doe"
+    email: "johndoe@mail.com"
+
+servers:
+- url: "http://localhost:8080"
+  description: "Local server"
+
+paths:
+  /homes:
+    get:
+      operationId: "listHomes"
+      tags:
+        - "homes"
+      summary: "List Homes"
+      description: "Returns a list of user's Homes"
+      parameters:
+      - $ref: "#/components/parameters/limit"
+      - $ref: "#/components/parameters/offset"
+      responses:
+        '200':
+          description: "A list of Homes"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Homes"
+        default:
+          $ref: "#/components/responses/default"
+    post:
+      operationId: "createHome"
+      tags:
+        - "homes"
+      summary: "Create Home"
+      description: "Creates new Home"
+      requestBody:
+        description: "Home"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Home"
+        required: true
+      responses:
+        '201':
+          description: "A Home was created"
+          headers:
+            Location:
+              description: "A new Home location path"
+              schema:
+                type: "string"
+                example: "/homes/32aaf405-3f32-40cc-942e-b84cc905146c"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "Created"
+        default:
+          $ref: "#/components/responses/default"
+  /homes/{id}:
+    parameters:
+    - $ref: "#/components/parameters/homeId"
+    get:
+      operationId: "getHome"
+      tags:
+        - "homes"
+      summary: "Get Home"
+      description: "Returns user's Home by Id"
+      responses:
+        '200':
+          description: "A Home"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Home"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+    put:
+      operationId: "updateHome"
+      tags:
+        - "homes"
+      summary: "Update Home"
+      description: "Updates user's Home by Id"
+      requestBody:
+        description: "Home"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Home"
+        required: true
+      responses:
+        '204':
+          headers:
+            Location:
+              description: "An updated Home location path"
+              schema:
+                type: "string"
+                example: "/homes/32aaf405-3f32-40cc-942e-b84cc905146c"
+          description: "Home have been successfully updated"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+    delete:
+      operationId: "deleteHome"
+      tags:
+        - "homes"
+      summary: "Delete Home"
+      description: "Deletes user's Home by Id"
+      responses:
+        '204':
+          description: "Home have been successfully deleted"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+  /homes/{id}/routers/{imei}/link:
+    parameters:
+    - $ref: "#/components/parameters/homeId"
+    - $ref: "#/components/parameters/routerImei"
+    post:
+      operationId: "linkRouter"
+      tags:
+        - "homes"
+        - "routers"
+      summary: "Link Home to Router"
+      description: "Links user's Home to Router"
+      responses:
+        '204':
+          description: "Linked successfully"
+        '404':
+          $ref: "#/components/responses/notFound"
+        '409':
+          $ref: "#/components/responses/conflict"
+        default:
+          $ref: "#/components/responses/default"
+  /homes/{id}/routers/{imei}/unlink:
+    parameters:
+    - $ref: "#/components/parameters/homeId"
+    - $ref: "#/components/parameters/routerImei"
+    delete:
+      operationId: "unlinkRouter"
+      tags:
+        - "homes"
+        - "routers"
+      summary: "Unlink Home from Router"
+      description: "Unlinks user's Home from Router"
+      responses:
+        '204':
+          description: "Unlinked successfully"
+        '404':
+          $ref: "#/components/responses/notFound"
+        '409':
+          $ref: "#/components/responses/conflict"
+        default:
+          $ref: "#/components/responses/default"
+  /homes/{id}/routers:
+    parameters:
+    - $ref: "#/components/parameters/homeId"
+    - $ref: "#/components/parameters/limit"
+    - $ref: "#/components/parameters/offset"
+    get:
+      operationId: "listLinkedRouters"
+      tags:
+        - "homes"
+        - "routers"
+      summary: "List linked Routers"
+      description: "Returns a list for linked Routers"
+      responses:
+        '200':
+          description: "A list of linked routers"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Routers"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+
+components:
+  schemas:
+    Home:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          example: "32aaf405-3f32-40cc-942e-b84cc905146c"
+        name:
+          type: "string"
+          example: "Mansion"
+        owner:
+          type: "string"
+          example: "user@mail.com"
+      required:
+      - id
+      - name
+      - owner
+      example:
+        id: "32aaf405-3f32-40cc-942e-b84cc905146c"
+        name: "Mansion"
+        owner: "user@mail.com"
+    Homes:
+      type: "object"
+      properties:
+        total:
+          type: "integer"
+          example: 1000
+        limit:
+          type: "integer"
+          example: 100
+        offset:
+          type: "integer"
+          example: 10
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Home"
+      example:
+        total: 1000
+        limit: 100
+        offset: 10
+        data:
+        - id: "32aaf405-3f32-40cc-942e-b84cc905146c"
+          name: "Mansion"
+          owner: "user@mail.com"
+    Router:
+      type: "object"
+      properties:
+        imei:
+          type: "string"
+          example: "869521060310641"
+      example:
+        imei: "869521060310641"
+    Routers:
+      type: "object"
+      properties:
+        total:
+          type: "integer"
+          example: 1000
+        limit:
+          type: "integer"
+          example: 100
+        offset:
+          type: "integer"
+          example: 10
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Router"
+  parameters:
+    homeId:
+      name: "id"
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+        example: "32aaf405-3f32-40cc-942e-b84cc905146c"
+    routerImei:
+      name: "imei"
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+        example: "869521060310641"
+    limit:
+      name: "limit"
+      in: "query"
+      required: false
+      schema:
+       type: "integer"
+       example: 100
+    offset:
+      name: "offset"
+      in: "query"
+      required: false
+      schema:
+       type: "integer"
+       example: 10
+  responses:
+    default:
+      description: "Internal Server Error"
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Internal Server Error"
+    notFound:
+      description: "Not Found"
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Not Found"
+    conflict:
+      description: "Conflict"
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Conflict"
+
+tags:
+- name: "homes"
+  description: "Homes operations"
+- name: "routers"
+  description: "Routers operations"

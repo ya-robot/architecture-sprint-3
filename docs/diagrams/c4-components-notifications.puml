@@ -1,0 +1,23 @@
+@startuml Smart Home
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(apiGW, "API Gateway", "APISIX", "")
+
+Container_Boundary(notifications, "Notifications") {
+    Component(notificationsController, "Notifications Controller", "HTTP,gRPC server", "Allows admins to force push system and user notifications")
+    Component(notificationsService, "Notifications Service", "Golang interface", "Notifications creation, etc")
+    Component(messageQueueClient, "Message Queue Client", "Golang interface", "Pub/Sub to events and audit logs")
+}
+
+ContainerQueue(kafka, "Message Queue", "Kafka", "Manages system events")
+
+Rel_D(apiGW, notificationsController, "Makes REST, RPC calls", "HTTP, gRPC")
+
+Rel_D(notificationsController, notificationsService, "Uses")
+
+Rel_R(notificationsService, messageQueueClient, "Uses")
+
+Rel_R(messageQueueClient, kafka, "Pub/Sub", "TLS")
+
+@enduml

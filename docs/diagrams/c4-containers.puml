@@ -1,0 +1,70 @@
+@startuml Smart Home
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User", "Smart Home Platform user")
+Person(admin, "Admin", "Smart Home Platform admin")
+
+System_Boundary(smartHomePlatform, "Smart Home Platform") {
+    Container(webApp, "Web Application", "TS, Angular", "Allow users to manage homes, telemetry devices, telemetry rules")
+    Container(mobileApp, "Mobile Application", "TS, Angular, IONIC", "Allow users to manage homes, telemetry devices, telemetry rules")
+    Container(apiGW, "API Gateway", "APISIX", "")
+    Container(identityProvider, "Identity Provider", "Zitadel", "Provide identities. Manage auth processes. Federation integrations")
+    Container(telemetryWriter, "Telemetry Writer", "Golang", "Enrich incoming telemetry and write it to timeseries database")
+    Container(telemetryReader, "Telemetry Reader", "Golang", "Reads latest and aggregated data from timeseries database")
+    Container(mqttAdapter, "MQTT Adapter", "Golang", "Transmits incoming data from MQTT broker to durable message queue")
+    ContainerDb(tsDB, "Timeseries Database", "TimescaleDB", "Store, aggregate and provide telemetry data")
+    ContainerQueue(brokerMQTT, "MQTT Broker", "VerneMQ", "Provide EDGE telemetry collection")
+    ContainerQueue(kafka, "Message Queue", "Kafka", "Provide durable message queue for data collection and processing")
+    Container(homes, "Homes", "Golang", "Manage user's homes")
+    ContainerDb(homesDb, "Database", "Golang", "")
+    Container(routers, "Routers", "Golang", "Manage user's EDGE devices (routers)")
+    ContainerDb(routersDb, "Database", "Golang", "")
+    Container(devices, "DevicesI", "Golang", "Manage user's telemetry devices")
+    ContainerDb(devicesDb, "Database", "Golang", "")
+    Container(telemetryRules, "Telemetry Rules", "Golang", "Manage rules applied for user's device telemetry")
+    ContainerDb(telemetryRulesDb, "Database", "Golang", "")
+    Container(notifications, "Notifications", "Golang", "Notify users with events")
+}
+
+Rel(user, webApp, "Uses", "HTTPS")
+Rel(user, mobileApp, "Uses", "HTTPS")
+
+Rel(admin, webApp, "Uses", "HTTPS")
+
+Rel_D(webApp, apiGW, "Uses", "HTTPS")
+
+Rel_D(mobileApp, apiGW, "Uses", "HTTPS")
+
+Rel_R(identityProvider, apiGW, "Manages auth", "HTTPS")
+
+Rel_D(apiGW, telemetryReader, "Reads aggregates", "HTTPS")
+Rel_D(apiGW, homes, "Manages homes", "HTTPS")
+Rel_D(apiGW, routers, "Manages routers", "HTTPS")
+Rel_D(apiGW, devices, "Manages devices", "HTTPS")
+Rel_D(apiGW, telemetryRules, "Manages telemetry rules", "HTTPS")
+
+Rel_R(mqttAdapter, brokerMQTT, "Pub/Sub telemetry", "MQTT")
+Rel_L(mqttAdapter, kafka, "Pub/Sub telemetry", "TLS")
+
+Rel_R(telemetryWriter, kafka, "Reads raw telemetry", "TLS")
+Rel_L(telemetryWriter, tsDB, "Inserts enriched telemetry", "TLS")
+Rel_L(telemetryWriter, telemetryRules, "Checks data against rules", "gRPC")
+
+Rel_R(telemetryReader, tsDB, "Reads telemetry", "TLS")
+
+Rel_R(homes, homesDb, "Manages homes", "TLS")
+Rel_R(homes, kafka, "Reads events", "TLS")
+
+Rel_R(routers, routersDb, "Manages routers", "TLS")
+Rel_R(routers, kafka, "Reads events", "TLS")
+
+Rel_R(devices, devicesDb, "Manages devices", "TLS")
+Rel_R(devices, kafka, "Reads events", "TLS")
+
+Rel_R(telemetryRules, telemetryRulesDb, "Manages telemetry rules", "TLS")
+Rel_R(telemetryRules, kafka, "Reads events", "TLS")
+
+Rel_R(notifications, kafka, "Reads events", "TLS")
+Rel_U(notifications, apiGW, "Pushes notificaitons", "HTTPS")
+
+@enduml

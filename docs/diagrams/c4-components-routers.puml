@@ -1,0 +1,35 @@
+@startuml Smart Home
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(apiGW, "API Gateway", "APISIX", "")
+
+Container_Boundary(routers, "Routers") {
+    Component(routersController, "Routers Controller", "HTTP,gRPC server", "Allows users to manage their routers")
+    Component(routersService, "Routers Service", "Golang interface", "Routers CRUD, etc")
+    Component(messageQueueClient, "Message Queue Client", "Golang interface", "Pub/Sub to events and audit logs")
+    Component(homesClient, "Homes Client", "Golang interface", "Sends requests to Homes Service")
+    Component(routersRepository, "Routers Repository", "Golang interface", "Sends requests to storage driver")
+}
+
+ContainerDb(db, "Database", "Postgres", "Stores user's routers, etc")
+
+ContainerQueue(kafka, "Message Queue", "Kafka", "Manages system events")
+
+Container(homes, "Homes", "Golang", "Manage user's homes")
+
+Rel_D(apiGW, routersController, "Makes REST, RPC calls", "HTTP, gRPC")
+
+Rel_D(routersController, routersService, "Uses")
+
+Rel_L(routersService, homesClient, "Uses")
+Rel_R(routersService, messageQueueClient, "Uses")
+Rel_D(routersService, routersRepository, "Uses")
+
+Rel_D(routersRepository, db, "Uses", "TLS")
+
+Rel_R(messageQueueClient, kafka, "Pub/Sub", "TLS")
+
+Rel_L(homesClient, homes, "Makes RPC calls", "gRPC")
+
+@enduml

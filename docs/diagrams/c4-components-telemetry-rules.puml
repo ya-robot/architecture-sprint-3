@@ -1,0 +1,35 @@
+@startuml Smart Home
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(apiGW, "API Gateway", "APISIX", "")
+
+Container_Boundary(telemetryRules, "Telemetry Rules") {
+    Component(telemetryRulesController, "Telemetry Rules Controller", "HTTP,gRPC server", "Allows users to manage their telemetry rules")
+    Component(telemetryRulesService, "Telemetry Rules Service", "Golang interface", "Telemetry Rules CRUD, etc")
+    Component(messageQueueClient, "Message Queue Client", "Golang interface", "Pub/Sub to events and audit logs")
+    Component(devicesClient, "Devices Client", "Golang interface", "Sends requests to Devices Service")
+    Component(telemetryRulesRepository, "Telemetry Rules Repository", "Golang interface", "Sends requests to storage driver")
+}
+
+ContainerDb(db, "Database", "Postgres", "Stores user's telemetry rules, etc")
+
+ContainerQueue(kafka, "Message Queue", "Kafka", "Manages system events")
+
+Container(devices, "Devices", "Golang", "Manage user's devices")
+
+Rel_D(apiGW, telemetryRulesController, "Makes REST, RPC calls", "HTTP, gRPC")
+
+Rel_D(telemetryRulesController, telemetryRulesService, "Uses")
+
+Rel_L(telemetryRulesService, devicesClient, "Uses")
+Rel_R(telemetryRulesService, messageQueueClient, "Uses")
+Rel_D(telemetryRulesService, telemetryRulesRepository, "Uses")
+
+Rel_D(telemetryRulesRepository, db, "Uses", "TLS")
+
+Rel_R(messageQueueClient, kafka, "Pub/Sub", "TLS")
+
+Rel_L(devicesClient, devices, "Makes RPC calls", "gRPC")
+
+@enduml

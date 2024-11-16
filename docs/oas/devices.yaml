@@ -1,0 +1,355 @@
+openapi: "3.0.3"
+
+info:
+  title: "Devices API"
+  description: "Smart Home system Devices management API"
+  version: "1.0.0"
+  contact:
+    name: "John Doe"
+    email: "johndoe@mail.com"
+
+servers:
+- url: "http://localhost:8080"
+  description: "Local server"
+
+paths:
+  /devices:
+    get:
+      operationId: "listDevices"
+      tags:
+        - "devices"
+      summary: "List Devices"
+      description: "Returns a list of Devices"
+      parameters:
+      - $ref: "#/components/parameters/limit"
+      - $ref: "#/components/parameters/offset"
+      responses:
+        '200':
+          description: "A list of Devices"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Devices"
+        default:
+          $ref: "#/components/responses/default"
+    post:
+      operationId: "createDevice"
+      tags:
+        - "devices"
+      summary: "Create Device"
+      description: "Creates new Device"
+      requestBody:
+        description: "Device"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Device"
+        required: true
+      responses:
+        '201':
+          description: "A Device was created"
+          headers:
+            Location:
+              description: "A new Device location path"
+              schema:
+                type: "string"
+                example: "/devices/32aaf405-3f32-40cc-942e-b84cc905146c"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "Created"
+        default:
+          $ref: "#/components/responses/default"
+  /devices/{id}:
+    parameters:
+    - $ref: "#/components/parameters/deviceId"
+    get:
+      operationId: "getDevice"
+      tags:
+        - "devices"
+      summary: "Get Device"
+      description: "Returns Device by Id"
+      responses:
+        '200':
+          description: "A Device"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Device"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+    put:
+      operationId: "updateDevice"
+      tags:
+        - "devices"
+      summary: "Update Device"
+      description: "Updates Device by Id"
+      requestBody:
+        description: "Device"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Device"
+        required: true
+      responses:
+        '204':
+          headers:
+            Location:
+              description: "An updated Device location path"
+              schema:
+                type: "string"
+                example: "/devices/32aaf405-3f32-40cc-942e-b84cc905146c"
+          description: "Device have been successfully updated"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+    delete:
+      operationId: "deleteDevice"
+      tags:
+        - "devices"
+      summary: "Delete Device"
+      description: "Deletes Device by Id"
+      responses:
+        '204':
+          description: "Device have been successfully deleted"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+  /device-types:
+    get:
+      operationId: "listDeviceTypes"
+      tags:
+        - "devices-types"
+      summary: "List Device Types"
+      description: "Returns a list of Device Types"
+      parameters:
+      - $ref: "#/components/parameters/limit"
+      - $ref: "#/components/parameters/offset"
+      responses:
+        '200':
+          description: "A list of Device Types"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceTypes"
+        default:
+          $ref: "#/components/responses/default"
+    post:
+      operationId: "createDeviceType"
+      tags:
+        - "devices-types"
+      summary: "Create Device Type"
+      description: "Creates new Device Type"
+      requestBody:
+        description: "Device Type"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceType"
+        required: true
+      responses:
+        '201':
+          description: "A Device Type was created"
+          headers:
+            Location:
+              description: "A new Device Type location path"
+              schema:
+                type: "string"
+                example: "/device-types/13"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+                example: "Created"
+        default:
+          $ref: "#/components/responses/default"
+  /device-types/{id}:
+    parameters:
+    - $ref: "#/components/parameters/deviceId"
+    get:
+      operationId: "getDeviceType"
+      tags:
+        - "devices-types"
+      summary: "Get Device Type"
+      description: "Returns Device Type by Id"
+      responses:
+        '200':
+          description: "A Device Type"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceType"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+    put:
+      operationId: "updateDeviceType"
+      tags:
+        - "devices-types"
+      summary: "Update Device Type"
+      description: "Updates Device Type by Id"
+      requestBody:
+        description: "Device Type"
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeviceType"
+        required: true
+      responses:
+        '204':
+          headers:
+            Location:
+              description: "An updated Device Type location path"
+              schema:
+                type: "string"
+                example: "/device-types/13"
+          description: "Device Type have been successfully updated"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+    delete:
+      operationId: "deleteDeviceType"
+      tags:
+        - "devices-types"
+      summary: "Delete Device Type"
+      description: "Deletes Device Type by Id"
+      responses:
+        '204':
+          description: "Device Type have been successfully deleted"
+        '404':
+          $ref: "#/components/responses/notFound"
+        default:
+          $ref: "#/components/responses/default"
+
+components:
+  schemas:
+    Device:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          example: "32aaf405-3f32-40cc-942e-b84cc905146c"
+        name:
+          type: "string"
+          example: "MEGA Heat Control 10"
+        deviceTypeId:
+          type: "integer"
+          example: 13
+      required:
+      - id
+      - name
+      - deviceTypeId
+      example:
+        id: "32aaf405-3f32-40cc-942e-b84cc905146c"
+        name: "MEGA Heat Control 10"
+        deviceTypeId: 13
+    Devices:
+      type: "object"
+      properties:
+        total:
+          type: "integer"
+          example: 1000
+        limit:
+          type: "integer"
+          example: 100
+        offset:
+          type: "integer"
+          example: 10
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Device"
+      example:
+        total: 1000
+        limit: 100
+        offset: 10
+        data:
+        - id: "32aaf405-3f32-40cc-942e-b84cc905146c"
+          name: "MEGA Heat Control 10"
+          deviceTypeId: 13
+    DeviceType:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          example: 13
+        name:
+          type: "string"
+          example: "ROMASHKA Heating Systems"
+        revision:
+          type: "string"
+          example: "11102013v9876554"
+      required:
+      - id
+      - name
+      - revision
+      example:
+        id: 13
+        name: "ROMASHKA Heating Systems"
+        revision: "11102013v9876554"
+    DeviceTypes:
+      type: "object"
+      properties:
+        total:
+          type: "integer"
+          example: 1000
+        limit:
+          type: "integer"
+          example: 100
+        offset:
+          type: "integer"
+          example: 10
+        data:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/DeviceType"
+  parameters:
+    deviceId:
+      name: "id"
+      in: "path"
+      required: true
+      schema:
+        type: "string"
+        example: "32aaf405-3f32-40cc-942e-b84cc905146c"
+    limit:
+      name: "limit"
+      in: "query"
+      required: false
+      schema:
+       type: "integer"
+       example: 100
+    offset:
+      name: "offset"
+      in: "query"
+      required: false
+      schema:
+       type: "integer"
+       example: 10
+  responses:
+    default:
+      description: "Internal Server Error"
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Internal Server Error"
+    notFound:
+      description: "Not Found"
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "Not Found"
+
+tags:
+- name: "devices"
+  description: "Devices operations"
+- name: "devices-types"
+  description: "Devices Types operations"
